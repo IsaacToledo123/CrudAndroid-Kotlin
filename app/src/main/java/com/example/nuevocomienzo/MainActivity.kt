@@ -21,19 +21,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@Composable
-fun FakeHomeViewModel(): HomeViewModel {
-    return HomeViewModel().apply {
-        // You can add some initial fake data here if needed
-        // For example:
-        // onChangeProductName("Sample Product")
-        // onChangeProductPrice("99.99")
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(homeViewModel = FakeHomeViewModel())
-}

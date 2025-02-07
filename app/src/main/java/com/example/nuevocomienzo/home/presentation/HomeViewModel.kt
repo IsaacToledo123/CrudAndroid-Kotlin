@@ -8,9 +8,13 @@ import com.example.nuevocomienzo.home.data.model.CreateProductRequest
 import com.example.nuevocomienzo.home.data.model.ProductDTO
 import com.example.nuevocomienzo.home.domain.CreateProductUseCase
 import com.example.nuevocomienzo.home.domain.GetProductsUseCase
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val context: Context) : ViewModel() {
     private val getProductsUseCase = GetProductsUseCase()
     private val createProductUseCase = CreateProductUseCase()
 
@@ -57,6 +61,26 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    private fun vibratePhone() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                val vibrator = vibratorManager.defaultVibrator
+                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(50)
+                }
+            }
+        } catch (e: Exception) {
+        }
+    }
+
     fun createProduct() {
         val name = _productName.value ?: ""
         val price = _productPrice.value?.toDoubleOrNull() ?: 0.0
@@ -74,6 +98,9 @@ class HomeViewModel : ViewModel() {
                     val currentList = _products.value.orEmpty().toMutableList()
                     currentList.add(newProduct)
                     _products.value = currentList
+
+                    // Vibrar al crear exitosamente
+                    vibratePhone()
 
                     // Limpiar campos
                     _productName.value = ""

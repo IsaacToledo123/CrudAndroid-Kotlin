@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata) //LiveData
     implementation(libs.retrofit)
     implementation(libs.gson)
+    implementation(libs.coil.compose)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.junit)

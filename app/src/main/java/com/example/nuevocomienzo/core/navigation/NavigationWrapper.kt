@@ -1,10 +1,15 @@
 package com.example.nuevocomienzo.core.navigation
 
+import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.nuevocomienzo.home.presentation.HomeScreen
 import com.example.nuevocomienzo.home.presentation.HomeViewModel
 import com.example.nuevocomienzo.log.presentation.LoginScreen
@@ -53,7 +58,13 @@ fun NavigationWrapper() {
         }
 
         composable(Home.route) {
-            val homeViewModel: HomeViewModel = viewModel()
+            val homeViewModel: HomeViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        HomeViewModel(navController.context)
+                    }
+                }
+            )
             HomeScreen(
                 homeViewModel = homeViewModel
             )
