@@ -1,13 +1,10 @@
 package com.example.nuevocomienzo.core.navigation
 
-import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.nuevocomienzo.home.presentation.HomeScreen
@@ -16,6 +13,7 @@ import com.example.nuevocomienzo.log.presentation.LoginScreen
 import com.example.nuevocomienzo.log.presentation.LoginViewModel
 import com.example.nuevocomienzo.registro.presentation.RegisterScreen
 import com.example.nuevocomienzo.registro.presentation.RegisterViewModel
+import com.example.nuevocomienzo.welcome.WelcomeScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -23,8 +21,19 @@ fun NavigationWrapper() {
 
     NavHost(
         navController = navController,
-        startDestination = Register.route
+        startDestination = Welcome.route
     ) {
+        composable(Welcome.route) {
+            WelcomeScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Login.route)
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Register.route)
+                }
+            )
+        }
+
         composable(Register.route) {
             val registerViewModel: RegisterViewModel = viewModel()
             RegisterScreen(

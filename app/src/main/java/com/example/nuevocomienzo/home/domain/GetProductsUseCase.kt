@@ -10,8 +10,7 @@ class GetProductsUseCase {
     suspend operator fun invoke(): Result<List<ProductDTO>> {
         val result = repository.getProducts()
 
-        // Aquí iría la lógica de negocio si es necesaria
-        // Por ejemplo, filtrar productos, ordenarlos, etc.
+
         return result
     }
 }
