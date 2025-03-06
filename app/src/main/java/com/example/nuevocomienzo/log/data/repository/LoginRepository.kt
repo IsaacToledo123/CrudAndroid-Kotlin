@@ -9,10 +9,11 @@ import kotlinx.coroutines.withContext
 class LoginRepository {
     private val loginService = RetrofitHelper.loginService
 
-    suspend fun login(username: String, password: String): Result<LoginDTO> {
+    suspend fun login(email: String, password: String): Result<LoginDTO> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = loginService.login(LoginRequest(username, password))
+                val response = loginService.login(LoginRequest(email, password))
+                println(response)
                 if (response.isSuccessful) {
                     Result.success(response.body()!!)
                 } else {

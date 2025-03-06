@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
-    private const val BASE_URL = "https://apipruebas-oour.onrender.com"
+    private const val BASE_URL = "https://api-movil.piweb.lat"
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()

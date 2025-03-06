@@ -82,31 +82,53 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                     color = primaryColor
                 )
 
-                IconButton(
-                    onClick = { showOrderTrackingModal = true },
+                BadgedBox(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(surfaceColor, shape = CircleShape)
-                ) {
-                    Badge(
-                        modifier = Modifier
-                            .offset(x = 14.dp, y = (-14).dp)
-                            .align(Alignment.TopEnd),
-                        containerColor = accentColor
-                    ) {
-                        Text(
-                            text = orders.size.toString(),
-                            color = Color.White,
-                            fontSize = 12.sp
-                        )
+                        .background(surfaceColor, shape = CircleShape),
+                    badge = {
+                        Badge(
+                            containerColor = accentColor
+                        ) {
+                            Text(
+                                text = orders.size.toString(),
+                                color = Color.White,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.Default.ShoppingBag,
-                        contentDescription = "Ver mis pedidos",
-                        tint = accentColor,
-                        modifier = Modifier.size(24.dp)
-                    )
+                ) {
+                    IconButton(
+                        onClick = { showOrderTrackingModal = true }
+                    ) {
+                        IconButton(
+                            onClick = { showOrderTrackingModal = true },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(surfaceColor, shape = CircleShape)
+                        ) {
+                            Badge(
+                                modifier = Modifier
+                                    .offset(x = 14.dp, y = (-14).dp)
+                                    .align(Alignment.TopEnd),
+                                containerColor = accentColor
+                            ) {
+                                Text(
+                                    text = orders.size.toString(),
+                                    color = Color.White,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.Default.ShoppingBag,
+                                contentDescription = "Ver mis pedidos",
+                                tint = accentColor,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 }
+
             }
 
             // Error message
@@ -211,7 +233,7 @@ private fun OrderTrackingModal(
                     }
                 }
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.padding(vertical = 16.dp),
                     color = Color(0xFFE5E5E5)
                 )
@@ -246,13 +268,7 @@ private fun OrderTrackingModal(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                            OrderCard(
-                                order = order,
-                                surfaceColor = surfaceColor,
-                                primaryColor = primaryColor,
-                                secondaryColor = secondaryColor,
-                                accentColor = accentColor
-                            )
+
 
                     }
                 }
@@ -370,13 +386,13 @@ private fun OrderCard(
             }
 
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 color = statusColor,
-                trackColor = Color(0xFFE5E5E5)
+                trackColor = Color(0xFFE5E5E5),
             )
 
             Spacer(modifier = Modifier.height(12.dp))

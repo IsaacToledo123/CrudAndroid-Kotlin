@@ -13,7 +13,7 @@ class LoginUseCase {
 
         return validationResult.fold(
             onSuccess = { loginRequest ->
-                repository.login(loginRequest.username, loginRequest.password)
+                repository.login(loginRequest.email, loginRequest.password)
             },
             onFailure = { error ->
                 Result.failure(error)
