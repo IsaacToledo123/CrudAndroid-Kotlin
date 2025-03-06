@@ -10,7 +10,6 @@ class CreateUserUSeCase {
     suspend operator fun invoke(user: CreateUserRequest) : Result<UserDTO> {
         val result = repository.createUser(user)
 
-        //En caso de existir acá debe estar la lógica de negocio
         return result
     }
 }

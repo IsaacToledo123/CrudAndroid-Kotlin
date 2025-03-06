@@ -1,5 +1,6 @@
 package com.example.nuevocomienzo.registro.presentation
 
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,8 +18,20 @@ class RegisterViewModel : ViewModel() {
     private var _username = MutableLiveData<String>()
     val username: LiveData<String> = _username
 
+    private var _nombre = MutableLiveData<String>()
+    val nombre: LiveData<String> = _nombre
+
+    private var _apellidos = MutableLiveData<String>()
+    val apellidos: LiveData<String> = _apellidos
+
+    private var _email = MutableLiveData<String>()
+    val email: LiveData<String> = _email
+
     private var _password = MutableLiveData<String>()
     val password: LiveData<String> = _password
+
+    private var _tipoUser = MutableLiveData<String>()
+    val tipoUser: LiveData<String> = _tipoUser
 
     private var _success = MutableLiveData<Boolean>(false)
     val success: LiveData<Boolean> = _success
@@ -35,8 +48,24 @@ class RegisterViewModel : ViewModel() {
         _error.value = ""
     }
 
+    fun onChangeNombre(nombre: String) {
+        _nombre.value = nombre
+    }
+
+    fun onChangeApellidos(apellidos: String) {
+        _apellidos.value = apellidos
+    }
+
+    fun onChangeEmail(email: String) {
+        _email.value = email
+    }
+
     fun onChangePassword(password: String) {
         _password.value = password
+    }
+
+    fun onChangeTipoUser(tipoUser: String) {
+        _tipoUser.value = tipoUser
     }
 
     suspend fun onFocusChanged() {
@@ -65,8 +94,19 @@ class RegisterViewModel : ViewModel() {
 
     suspend fun onClick(user: CreateUserRequest) {
         viewModelScope.launch {
-            if (_username.value.isNullOrBlank() || _password.value.isNullOrBlank()) {
+            if (_username.value.isNullOrBlank() ||
+                _password.value.isNullOrBlank() ||
+                _nombre.value.isNullOrBlank() ||
+                _apellidos.value.isNullOrBlank() ||
+                _email.value.isNullOrBlank() ||
+                _tipoUser.value.isNullOrBlank()) {
                 _error.value = "Todos los campos son requeridos"
+                return@launch
+            }
+
+            // Validación básica de email
+            if (!isValidEmail(_email.value!!)) {
+                _error.value = "El formato del email no es válido"
                 return@launch
             }
 
@@ -79,5 +119,10 @@ class RegisterViewModel : ViewModel() {
                 _error.value = exception.message ?: "Error al crear usuario"
             }
         }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        val pattern = Patterns.EMAIL_ADDRESS
+        return pattern.matcher(email).matches()
     }
 }
