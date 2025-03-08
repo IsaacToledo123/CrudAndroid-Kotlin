@@ -44,7 +44,7 @@ class HomeViewModel(private val context: Context) : ViewModel() {
             _isLoading.value = true
             getProductsUseCase().fold(
                 onSuccess = { productList ->
-                    _products.value = productList
+                    _products.value = productList.data
                     _error.value = ""
                 },
                 onFailure = { exception ->

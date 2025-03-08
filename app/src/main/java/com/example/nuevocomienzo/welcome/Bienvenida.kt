@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -91,7 +92,7 @@ fun WelcomeScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Login,
+                        imageVector = Icons.AutoMirrored.Filled.Login,
                         contentDescription = "Iniciar Sesión",
                         modifier = Modifier.padding(end = 8.dp)
                     )

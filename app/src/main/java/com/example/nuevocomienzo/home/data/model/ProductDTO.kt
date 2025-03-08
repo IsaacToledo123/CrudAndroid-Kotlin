@@ -1,6 +1,9 @@
 package com.example.nuevocomienzo.home.data.model
 
-
+data class ProductResponse(
+    val status: String,
+    val data: List<ProductDTO>
+)
 
 data class ProductDTO(
     val id: String,

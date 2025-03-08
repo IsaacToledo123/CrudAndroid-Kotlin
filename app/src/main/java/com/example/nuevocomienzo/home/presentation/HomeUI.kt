@@ -470,7 +470,7 @@ private fun ProductCard(
             ) {
                 if (!product.imageUrl.isNullOrEmpty()) {
                     AsyncImage(
-                        model = product.imageUrl,
+                        model = "https://api-movil.piweb.lat" + product.imageUrl,
                         contentDescription = product.name,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

@@ -3,13 +3,14 @@ package com.example.nuevocomienzo.home.data.repository
 import com.example.nuevocomienzo.core.network.RetrofitHelper
 import com.example.nuevocomienzo.home.data.model.CreateProductRequest
 import com.example.nuevocomienzo.home.data.model.ProductDTO
+import com.example.nuevocomienzo.home.data.model.ProductResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class HomeRepository {
     private val homeService = RetrofitHelper.productService
 
-    suspend fun getProducts(): Result<List<ProductDTO>> {
+    suspend fun getProducts(): Result<ProductResponse> {
         return try {
             val response = homeService.getProducts()
             if (response.isSuccessful) {
@@ -18,6 +19,7 @@ class HomeRepository {
                 Result.failure(Exception(response.errorBody()?.string()))
             }
         } catch (e: Exception) {
+            println("error: $e")
             Result.failure(e)
         }
     }

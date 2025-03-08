@@ -1,5 +1,6 @@
 package com.example.nuevocomienzo.log.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,10 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.nuevocomienzo.core.services.FirebaseMessagingServices
+import com.google.firebase.inappmessaging.FirebaseInAppMessaging
 
 
 @Composable
@@ -29,18 +33,31 @@ fun LoginScreen(
     val password: String by loginViewModel.password.observeAsState("")
     val loginState: LoginState by loginViewModel.loginState.observeAsState(LoginState.Initial)
     var isPasswordVisible by remember { mutableStateOf(false) }
+    val fcmToken: String? by loginViewModel.fcmToken.observeAsState()
+    val installationId: String? by loginViewModel.installationId.observeAsState()
 
-    // Colors
     val backgroundColor = Color(0xFFF5F5F7)
     val primaryColor = Color(0xFF000000)
     val secondaryColor = Color(0xFF86868B)
     val accentColor = Color(0xFF007AFF)
     val surfaceColor = Color(0xFFFFFFFF)
     val errorColor = Color(0xFFFF3B30)
+    val context = LocalContext.current
 
-    // Handle login success
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
+
+            FirebaseMessagingServices.initialize(context)
+            fcmToken?.let {
+                println("FCM Token: $it")
+                Toast.makeText(context, "FCM Token: $it", Toast.LENGTH_LONG).show()
+            }
+
+            installationId?.let {
+                println("Firebase Installation ID: $it")
+                Toast.makeText(context, "ID Instalación: $it", Toast.LENGTH_LONG).show()
+            }
+
             onLoginSuccess()
         }
     }
@@ -58,7 +75,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Title Section
             Text(
                 text = "Welcome Back",
                 fontSize = 34.sp,
@@ -73,7 +89,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Input Fields Container
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -85,7 +100,6 @@ fun LoginScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Username TextField
                     OutlinedTextField(
                         value = username,
                         onValueChange = { loginViewModel.onChangeUsername(it) },
@@ -109,7 +123,6 @@ fun LoginScreen(
                         isError = loginState is LoginState.Error && username.isBlank()
                     )
 
-                    // Password TextField
                     OutlinedTextField(
                         value = password,
                         onValueChange = { loginViewModel.onChangePassword(it) },
