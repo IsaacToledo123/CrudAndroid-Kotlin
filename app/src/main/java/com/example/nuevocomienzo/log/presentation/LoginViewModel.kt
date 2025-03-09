@@ -45,7 +45,7 @@ class LoginViewModel : ViewModel() {
             loginUseCase(username, password)
                 .onSuccess { response ->
                     _loginState.value = LoginState.Success(response)
-                    println(response)
+                    println(response.data)
                 }
                 .onFailure { exception ->
                     _loginState.value = LoginState.Error(exception.message ?: "Error desconocido")

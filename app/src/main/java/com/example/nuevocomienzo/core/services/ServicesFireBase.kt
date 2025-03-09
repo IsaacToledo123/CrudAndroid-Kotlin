@@ -10,7 +10,6 @@ object FirebaseMessagingServices {
 
     fun initialize(context: Context) {
         FirebaseApp.initializeApp(context) ?: FirebaseApp.getInstance()
-
     }
     private val firebaseApp: FirebaseApp by lazy {
         FirebaseApp.getInstance()

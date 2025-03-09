@@ -9,10 +9,9 @@ data class ProductDTO(
     val id: String,
     val name: String,
     val costo: Double,
-    val cantidad: Double,
+    val cantidad: Int,
     val imageUrl: String?,
     val idUser: String
-
 )
 
 data class CreateProductRequest(

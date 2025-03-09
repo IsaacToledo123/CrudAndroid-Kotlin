@@ -1,6 +1,5 @@
 package com.example.nuevocomienzo.log.presentation
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -20,14 +18,13 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nuevocomienzo.core.services.FirebaseMessagingServices
-import com.google.firebase.inappmessaging.FirebaseInAppMessaging
 
 
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: (Any?) -> Unit
 ) {
     val username: String by loginViewModel.username.observeAsState("")
     val password: String by loginViewModel.password.observeAsState("")
@@ -50,15 +47,14 @@ fun LoginScreen(
             FirebaseMessagingServices.initialize(context)
             fcmToken?.let {
                 println("FCM Token: $it")
-                Toast.makeText(context, "FCM Token: $it", Toast.LENGTH_LONG).show()
             }
 
             installationId?.let {
                 println("Firebase Installation ID: $it")
-                Toast.makeText(context, "ID Instalación: $it", Toast.LENGTH_LONG).show()
             }
 
-            onLoginSuccess()
+            val userType = (loginState as LoginState.Success).data
+            onLoginSuccess(userType.data)
         }
     }
 
@@ -171,7 +167,6 @@ fun LoginScreen(
                 }
             }
 
-            // Error message
             if (loginState is LoginState.Error) {
                 Text(
                     text = (loginState as LoginState.Error).message,
@@ -181,7 +176,6 @@ fun LoginScreen(
                 )
             }
 
-            // Login Button
             Button(
                 onClick = { loginViewModel.login() },
                 modifier = Modifier
@@ -209,7 +203,6 @@ fun LoginScreen(
                 }
             }
 
-            // Register link
             TextButton(
                 onClick = onNavigateToRegister,
                 colors = ButtonDefaults.textButtonColors(

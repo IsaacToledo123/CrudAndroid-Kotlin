@@ -21,3 +21,19 @@ object Register {
 object Home {
     val route = "home"
 }
+
+@Serializable
+data class Seller(val userId: Int? = 0) {
+    companion object {
+        const val baseRoute = "seller"
+        fun createRoute(userId: Int) = "seller?userId=$userId"
+    }
+}
+
+@Serializable
+data class CreateProduct(val userId: Int? = 0) {
+    companion object {
+        const val baseRoute = "create_product"
+        fun createRoute(userId: Int) = "create_product?userId=$userId"
+    }
+}
