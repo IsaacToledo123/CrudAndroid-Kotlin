@@ -308,7 +308,7 @@ fun OrdersList(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "No tienes pedidos activos",
+                    text = "No tienes pedidos activosss",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = secondaryColor
