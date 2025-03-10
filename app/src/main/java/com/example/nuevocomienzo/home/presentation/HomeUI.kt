@@ -36,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.nuevocomienzo.home.data.model.OrderInfo
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.rounded.Close
 
 
 @Composable
@@ -226,7 +228,7 @@ private fun OrderTrackingModal(
                     )
                     IconButton(onClick = onDismiss) {
                         Icon(
-                            imageVector = Icons.Default.AddShoppingCart,
+                            imageVector = Icons.Rounded.Close,
                             contentDescription = "Cerrar",
                             tint = secondaryColor
                         )
@@ -239,7 +241,6 @@ private fun OrderTrackingModal(
                 )
 
                 if (orders.isEmpty()) {
-                    // Mostrar mensaje si no hay pedidos
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -263,13 +264,19 @@ private fun OrderTrackingModal(
                         }
                     }
                 } else {
-
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-
-
+                        items(orders.size) { index ->
+                            OrderCard(
+                                order = orders[index],
+                                surfaceColor = surfaceColor,
+                                primaryColor = primaryColor,
+                                secondaryColor = secondaryColor,
+                                accentColor = accentColor
+                            )
+                        }
                     }
                 }
             }
@@ -278,7 +285,58 @@ private fun OrderTrackingModal(
 }
 
 @Composable
-private fun OrderCard(
+fun OrdersList(
+    orders: List<OrderInfo>,
+    primaryColor: Color = Color(0xFF333333),
+    secondaryColor: Color = Color(0xFF666666),
+    surfaceColor: Color = Color.White,
+    accentColor: Color = Color(0xFF007AFF)
+) {
+    if (orders.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = secondaryColor
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "No tienes pedidos activos",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = secondaryColor
+                )
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(orders) { order ->
+                OrderCard(
+                    order = order,
+                    surfaceColor = surfaceColor,
+                    primaryColor = primaryColor,
+                    secondaryColor = secondaryColor,
+                    accentColor = accentColor
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OrderCard(
     order: OrderInfo,
     surfaceColor: Color,
     primaryColor: Color,
@@ -289,22 +347,23 @@ private fun OrderCard(
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9))
+        colors = CardDefaults.cardColors(containerColor = surfaceColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            // Order ID and Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = order.id,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = secondaryColor
+                    text = "Pedido #${order.id}",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryColor
                 )
                 Text(
                     text = order.date,
@@ -313,123 +372,68 @@ private fun OrderCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = order.productName,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = primaryColor,
-                    modifier = Modifier.weight(1f)
-                )
+            // Product name and price
+            Text(
+                text = order.productName,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = primaryColor
+            )
 
-                Text(
-                    text = "$${order.price}",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryColor
-                )
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+
+
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Indicador de estado
+            // Status section with delivery estimate
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Indicador visual según el estado
-                val statusColor = when(order.status) {
-                    "Procesando" -> Color(0xFF007AFF)
-                    "En preparación" -> Color(0xFFFF9500)
-                    "Enviado" -> Color(0xFF34C759)
-                    "Entregado" -> Color(0xFF34C759)
-                    else -> secondaryColor
-                }
-
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(statusColor, CircleShape)
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    tint = secondaryColor,
+                    modifier = Modifier.size(20.dp)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Text(
-                    text = order.status,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = statusColor
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Barra de progreso
-            val progress = when(order.status) {
-                "Procesando" -> 0.25f
-                "En preparación" -> 0.5f
-                "Enviado" -> 0.75f
-                "Entregado" -> 1f
-                else -> 0f
-            }
-            val statusColor = when(order.status) {
-                "Procesando" -> Color(0xFF007AFF)
-                "En preparación" -> Color(0xFFFF9500)
-                "Enviado" -> Color(0xFF34C759)
-                "Entregado" -> Color(0xFF34C759)
-                else -> secondaryColor
-            }
-
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                color = statusColor,
-                trackColor = Color(0xFFE5E5E5),
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Mostrar estimación de entrega si está disponible
-            if (order.estimatedDelivery != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        tint = secondaryColor,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                Column {
                     Text(
-                        text = "Entrega estimada: ${order.estimatedDelivery}",
+                        text = "Estado: ${order.status}",
                         fontSize = 14.sp,
-                        color = secondaryColor
+                        fontWeight = FontWeight.Medium,
+                        color = primaryColor
                     )
+
+                    if (!order.estimatedDelivery.isNullOrEmpty()) {
+                        Text(
+                            text = "Entrega estimada: ${order.estimatedDelivery}",
+                            fontSize = 14.sp,
+                            color = secondaryColor
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // Botón para más detalles
-            OutlinedButton(
-                onClick = { /* No implementado */ },
-                modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = accentColor
-                ),
-                border = BorderStroke(1.dp, accentColor)
-            ) {
-                Text("Ver detalles")
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Status indicator
+            LinearProgressIndicator(
+                progress = when (order.status) {
+                    "Procesando" -> 0.25f
+                    "Enviado" -> 0.5f
+                    "En camino" -> 0.75f
+                    "Entregado" -> 1f
+                    else -> 0.1f
+                },
+                modifier = Modifier.fillMaxWidth(),
+                color = accentColor
+            )
         }
     }
 }
