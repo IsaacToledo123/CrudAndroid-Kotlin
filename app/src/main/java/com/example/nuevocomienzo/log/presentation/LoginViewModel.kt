@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.nuevocomienzo.core.services.FirebaseMessagingServices
 import com.example.nuevocomienzo.log.data.model.LoginDTO
 import com.example.nuevocomienzo.log.domain.LoginUseCase
 import kotlinx.coroutines.launch
@@ -52,16 +51,7 @@ class LoginViewModel : ViewModel() {
                 }
         }
     }
-    init {
-        FirebaseMessagingServices.getFCMToken { token ->
-            _fcmToken.postValue(token)
-        }
-
-        FirebaseMessagingServices.getIAPIId { id ->
-            _installationId.postValue(id)
-        }
-        println(loginState)
-    }
+    
 }
 
 sealed class LoginState {

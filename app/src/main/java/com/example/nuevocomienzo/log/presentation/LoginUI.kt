@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nuevocomienzo.core.services.FirebaseMessagingServices
+import com.example.nuevocomienzo.core.services.ServicesFireBase
 
 
 @Composable
@@ -43,16 +43,7 @@ fun LoginScreen(
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
-
-            FirebaseMessagingServices.initialize(context)
-            fcmToken?.let {
-                println("FCM Token: $it")
-            }
-
-            installationId?.let {
-                println("Firebase Installation ID: $it")
-            }
-
+            ServicesFireBase.initializeFirebaseMessaging()
             val userType = (loginState as LoginState.Success).data
             onLoginSuccess(userType.data)
         }

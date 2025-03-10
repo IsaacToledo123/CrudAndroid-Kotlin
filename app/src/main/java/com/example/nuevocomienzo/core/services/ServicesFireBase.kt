@@ -1,81 +1,88 @@
 package com.example.nuevocomienzo.core.services
 
-import android.content.Context
-import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.FirebaseMessaging
+import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.inappmessaging.FirebaseInAppMessaging
 import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 
-object FirebaseMessagingServices {
+class ServicesFireBase : FirebaseMessagingService() {
 
-    fun initialize(context: Context) {
-        FirebaseApp.initializeApp(context) ?: FirebaseApp.getInstance()
-    }
-    private val firebaseApp: FirebaseApp by lazy {
-        FirebaseApp.getInstance()
-    }
-
-    private val firebaseMessaging: FirebaseMessaging by lazy {
-        FirebaseMessaging.getInstance()
+    override fun onCreate() {
+        super.onCreate()
+        initializeService()
     }
 
-    private val firebaseInAppMessaging: FirebaseInAppMessaging by lazy {
-        FirebaseInAppMessaging.getInstance()
+    private fun initializeService() {
+        FirebaseMessaging.getInstance().token
+            .addOnSuccessListener { token ->
+                Log.d(TAG, "Token de FCM obtenido: $token")
+                sendRegistrationToServer(token)
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error al obtener el token de FCM", it)
+            }
+
+        getFirebaseInstallationId()
     }
 
-    fun getFCMToken(onTokenReceived: (String) -> Unit) {
-        firebaseMessaging.token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val token = task.result
-                onTokenReceived(token)
-            } else {
-                println("Error al obtener el token: ${task.exception}")
+    private fun getFirebaseInstallationId(): Task<String> {
+        return FirebaseInstallations.getInstance().id
+            .addOnSuccessListener { id ->
+                Log.d(TAG, "ID de instalación de Firebase: $id")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error al obtener el ID de instalación", it)
+            }
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        Log.d(TAG, "Nuevo token: $token")
+        sendRegistrationToServer(token)
+    }
+
+    private fun sendRegistrationToServer(token: String) {
+        // Aquí puedes enviar el token a tu backend si es necesario
+    }
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
+
+        if (remoteMessage.data.containsKey("triggerIAM")) {
+            val triggerValue = remoteMessage.data["triggerIAM"]
+            if ("true" == triggerValue) {
+                triggerInAppEvent("mensajeEspecial")
             }
         }
     }
 
-    fun getIAPIId(onIdReceived: (String) -> Unit) {
-        FirebaseInstallations.getInstance().id.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val id = task.result
-                onIdReceived(id)
-            } else {
-                println("Error al obtener el ID de instalación: ${task.exception}")
-            }
-        }
+    fun triggerInAppEvent(eventName: String) {
+        Log.d(TAG, "Activando evento In-App Messaging: $eventName")
+        FirebaseInAppMessaging.getInstance().triggerEvent(eventName)
     }
 
-    fun subscribeToTopic(topic: String) {
-        firebaseMessaging.subscribeToTopic(topic)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Suscrito al tema: $topic")
-                } else {
-                    println("Error al suscribirse al tema: ${task.exception}")
+    companion object {
+        private const val TAG = "ServicesFireBase"
+
+        fun initializeFirebaseMessaging() {
+            FirebaseMessaging.getInstance().token
+                .addOnSuccessListener { token ->
+                    Log.d(TAG, "Token de FCM obtenido: $token")
                 }
-            }
-    }
-
-    fun unsubscribeFromTopic(topic: String) {
-        firebaseMessaging.unsubscribeFromTopic(topic)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Desuscrito del tema: $topic")
-                } else {
-                    println("Error al desuscribirse del tema: ${task.exception}")
+                .addOnFailureListener {
+                    Log.e(TAG, "Error al obtener el token de FCM", it)
                 }
-            }
-    }
 
-    fun setInAppMessagingEnabled(enabled: Boolean) {
-        firebaseInAppMessaging.setMessagesSuppressed(!enabled)
-    }
-
-    fun setMessageHandler(onMessageReceived: (String) -> Unit) {
-        firebaseMessaging.token.addOnSuccessListener { token ->
-            println("Token de FCM: $token")
+            FirebaseInstallations.getInstance().id
+                .addOnSuccessListener { id ->
+                    Log.d(TAG, "ID de instalación de Firebase: $id")
+                }
+                .addOnFailureListener {
+                    Log.e(TAG, "Error al obtener el ID de instalación", it)
+                }
         }
-
-        firebaseMessaging.isAutoInitEnabled = true
     }
 }
