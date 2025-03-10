@@ -98,7 +98,7 @@ fun NavigationWrapper() {
         }
 
         composable(
-            route = Seller.baseRoute + "?userId={userId}",
+            route = Seller.BaseRoute + "?userId={userId}",
             arguments = listOf(
                 navArgument("userId") {
                     type = NavType.IntType

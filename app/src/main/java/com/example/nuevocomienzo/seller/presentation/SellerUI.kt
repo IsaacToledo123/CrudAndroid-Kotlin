@@ -26,86 +26,94 @@ fun SellerScreen(
     userId: Int,
     navController: NavController
 ) {
-    val backgroundColor = Color(0xFFF5F5F7)
-    val primaryColor = Color(0xFF000000)
-    val secondaryColor = Color(0xFF86868B)
-    val surfaceColor = Color(0xFFFFFFFF)
+    val backgroundColor = Color(0xFFF8F9FA)
+    val primaryColor = Color(0xFF1E88E5)
+    val secondaryColor = Color(0xFF757575)
+    val agotadoColor = Color(0xFFf81436)
+    val surfaceColor = Color.White
 
     val products by sellerViewModel.products.observeAsState(initial = emptyList())
     val isLoading by sellerViewModel.isLoading.observeAsState(initial = false)
     val error by sellerViewModel.error.observeAsState(initial = "")
 
     LaunchedEffect(key1 = Unit) {
-        sellerViewModel.loadProducts(userId)
+        sellerViewModel.loadProducts(1)
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
+        Spacer(modifier = Modifier.height(35.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+
+            Text(
+                text = "Mis Productos",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = primaryColor
+            )
+
+            Button(
+                onClick = {
+                    navController.navigate(CreateProduct.createRoute(userId))
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .height(48.dp)
+                    .wrapContentWidth()
+                    .padding(horizontal = 8.dp)
             ) {
                 Text(
-                    text = "Mis Productos",
-                    fontSize = 34.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryColor
+                    text = "Añadir Nuevo Producto",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    softWrap = true
                 )
+            }
 
-                // Botón para añadir un nuevo producto
-                Button(
-                    onClick = {
-                        navController.navigate(CreateProduct.createRoute(userId))
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
-                ) {
-                    Text(
-                        text = "Añadir Producto",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (error.isNotEmpty()) {
+            Text(
+                text = error,
+                color = Color.Red,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = primaryColor)
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 160.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(products.orEmpty()) { product ->
+                    ProductCard(
+                        product = product,
+                        surfaceColor = surfaceColor,
+                        primaryColor = primaryColor,
+                        secondaryColor = secondaryColor,
+                        color = agotadoColor
                     )
-                }
-            }
-
-            if (error.isNotEmpty()) {
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = primaryColor)
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 180.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(products.orEmpty()) { product ->
-                        ProductCard(
-                            product = product,
-                            surfaceColor = surfaceColor,
-                            primaryColor = primaryColor,
-                            secondaryColor = secondaryColor
-                        )
-                    }
                 }
             }
         }
@@ -117,31 +125,33 @@ private fun ProductCard(
     product: ProductDTO,
     surfaceColor: Color,
     primaryColor: Color,
-    secondaryColor: Color
+    secondaryColor: Color,
+    color: Color
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp),
+            .height(240.dp),
         shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(140.dp)
                     .background(Color(0xFFE5E5E5)),
                 contentAlignment = Alignment.Center
             ) {
                 if (!product.url_imagen.isNullOrEmpty()) {
                     AsyncImage(
-                        model = "https://api-movil.piweb.lat" + product.url_imagen,
+                        model = "https://api-movil.piweb.lat${product.url_imagen}",
                         contentDescription = product.name,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -154,21 +164,45 @@ private fun ProductCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = product.name,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Medium,
-                color = primaryColor
-            )
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = product.name,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    )
+                    if(product.cantidad >0){
+                        Text(
+                            text = "Cantidad: ${product.cantidad}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryColor
+                        )
+                    }else{
+                        Text(
+                            text = "Producto agotado",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = color
+                        )
+                    }
+                }
 
-            Text(
-                text = "$${product.costo}",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = primaryColor
-            )
+                Text(
+                    text = "$${product.costo}",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF2E7D32),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }

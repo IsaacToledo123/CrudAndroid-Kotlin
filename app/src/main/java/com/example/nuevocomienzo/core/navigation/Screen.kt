@@ -25,7 +25,7 @@ object Home {
 @Serializable
 data class Seller(val userId: Int? = 0) {
     companion object {
-        const val baseRoute = "seller"
+        const val BaseRoute = "seller"
         fun createRoute(userId: Int) = "seller?userId=$userId"
     }
 }

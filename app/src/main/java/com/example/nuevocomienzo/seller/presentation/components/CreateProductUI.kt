@@ -129,7 +129,7 @@ fun CreateProductScreen(createProductViewModel: CreateProductViewModel, id:Int, 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (imageBase64.isNotEmpty()) {
-            Text("Imagen seleccionada (Base64): ${imageBase64.take(50)}...") // Muestra los primeros 50 caracteres
+            Text("Imagen seleccionada (Base64): ${imageBase64.take(50)}...")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -161,7 +161,7 @@ fun CreateProductScreen(createProductViewModel: CreateProductViewModel, id:Int, 
             Text("Error: $error", color = MaterialTheme.colorScheme.error)
         }
         Button(
-            onClick = { navController?.popBackStack() },
+            onClick = { navController.popBackStack() },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Volver")
