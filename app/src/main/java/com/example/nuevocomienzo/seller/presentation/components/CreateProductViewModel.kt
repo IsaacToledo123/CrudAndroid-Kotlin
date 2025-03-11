@@ -49,6 +49,7 @@ class CreateProductViewModel: ViewModel()  {
     }
 
     fun createProduct(request: RequestProduct){
+        println("Prooo" + request.id_user)
         viewModelScope.launch {
             createProductUseCase(request).fold(
                 onSuccess = {

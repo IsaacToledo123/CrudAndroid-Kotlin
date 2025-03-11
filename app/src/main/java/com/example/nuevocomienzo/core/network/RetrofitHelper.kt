@@ -3,7 +3,7 @@ package com.example.nuevocomienzo.core.network
 import com.example.nuevocomienzo.home.data.dataSource.ProductService
 import com.example.nuevocomienzo.seller.data.dataSource.ProductServices
 import com.example.nuevocomienzo.registro.data.dataSource.RegisterService
-import com.example.nuevocomienzo.log.data.dataSource.LoginService
+import com.example.nuevocomienzo.login.data.dataSource.LoginService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

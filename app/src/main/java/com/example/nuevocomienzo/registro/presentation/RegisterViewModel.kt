@@ -15,9 +15,6 @@ class RegisterViewModel : ViewModel() {
     private val usernameUseCase = UsernameValidateUseCase()
     private val createUseCase = CreateUserUSeCase()
 
-    private var _username = MutableLiveData<String>()
-    val username: LiveData<String> = _username
-
     private var _nombre = MutableLiveData<String>()
     val nombre: LiveData<String> = _nombre
 
@@ -31,7 +28,7 @@ class RegisterViewModel : ViewModel() {
     val password: LiveData<String> = _password
 
     private var _tipoUser = MutableLiveData<String>()
-    val tipoUser: LiveData<String> = _tipoUser
+    val tipo_user: LiveData<String> = _tipoUser
 
     private var _success = MutableLiveData<Boolean>(false)
     val success: LiveData<Boolean> = _success
@@ -41,12 +38,6 @@ class RegisterViewModel : ViewModel() {
 
     private var _isRegistered = MutableLiveData<Boolean>(false)
     val isRegistered: LiveData<Boolean> = _isRegistered
-
-    fun onChangeUsername(username: String) {
-        _username.value = username
-        _success.value = false
-        _error.value = ""
-    }
 
     fun onChangeNombre(nombre: String) {
         _nombre.value = nombre
@@ -70,11 +61,6 @@ class RegisterViewModel : ViewModel() {
 
     suspend fun onFocusChanged() {
         viewModelScope.launch {
-            if (_username.value.isNullOrBlank()) {
-                _error.value = "El username no puede estar vacío"
-                _success.value = false
-                return@launch
-            }
 
             val result = usernameUseCase()
             result.onSuccess { data ->
@@ -94,8 +80,7 @@ class RegisterViewModel : ViewModel() {
 
     suspend fun onClick(user: CreateUserRequest) {
         viewModelScope.launch {
-            if (_username.value.isNullOrBlank() ||
-                _password.value.isNullOrBlank() ||
+            if (_password.value.isNullOrBlank() ||
                 _nombre.value.isNullOrBlank() ||
                 _apellidos.value.isNullOrBlank() ||
                 _email.value.isNullOrBlank() ||
@@ -104,7 +89,6 @@ class RegisterViewModel : ViewModel() {
                 return@launch
             }
 
-            // Validación básica de email
             if (!isValidEmail(_email.value!!)) {
                 _error.value = "El formato del email no es válido"
                 return@launch

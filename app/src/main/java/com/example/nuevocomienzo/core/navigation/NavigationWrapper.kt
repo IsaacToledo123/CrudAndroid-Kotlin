@@ -12,9 +12,9 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.nuevocomienzo.home.presentation.HomeScreen
 import com.example.nuevocomienzo.home.presentation.HomeViewModel
-import com.example.nuevocomienzo.log.data.model.UserInfo
-import com.example.nuevocomienzo.log.presentation.LoginScreen
-import com.example.nuevocomienzo.log.presentation.LoginViewModel
+import com.example.nuevocomienzo.login.data.model.UserInfo
+import com.example.nuevocomienzo.login.presentation.LoginScreen
+import com.example.nuevocomienzo.login.presentation.LoginViewModel
 import com.example.nuevocomienzo.registro.presentation.RegisterScreen
 import com.example.nuevocomienzo.registro.presentation.RegisterViewModel
 import com.example.nuevocomienzo.seller.presentation.SellerScreen
@@ -82,7 +82,6 @@ fun NavigationWrapper() {
 
             )
         }
-
 
         composable(Home.route) {
             val homeViewModel: HomeViewModel = viewModel(

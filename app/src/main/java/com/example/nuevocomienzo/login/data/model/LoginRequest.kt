@@ -1,4 +1,4 @@
-package com.example.nuevocomienzo.log.data.model
+package com.example.nuevocomienzo.login.data.model
 
 data class LoginRequest(
     val email: String,

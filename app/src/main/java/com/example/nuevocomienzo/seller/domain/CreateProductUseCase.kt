@@ -2,7 +2,6 @@ package com.example.nuevocomienzo.seller.domain
 
 import com.example.nuevocomienzo.seller.data.model.RequestProduct
 import com.example.nuevocomienzo.seller.data.model.ResponseCreateProduct
-import com.example.nuevocomienzo.seller.data.model.ResponseProduct
 import com.example.nuevocomienzo.seller.data.repository.SellerRepository
 
 class CreateProductUseCase {

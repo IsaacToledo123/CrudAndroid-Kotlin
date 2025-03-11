@@ -1,4 +1,4 @@
-package com.example.nuevocomienzo.log.presentation
+package com.example.nuevocomienzo.login.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,8 +30,6 @@ fun LoginScreen(
     val password: String by loginViewModel.password.observeAsState("")
     val loginState: LoginState by loginViewModel.loginState.observeAsState(LoginState.Initial)
     var isPasswordVisible by remember { mutableStateOf(false) }
-    val fcmToken: String? by loginViewModel.fcmToken.observeAsState()
-    val installationId: String? by loginViewModel.installationId.observeAsState()
 
     val backgroundColor = Color(0xFFF5F5F7)
     val primaryColor = Color(0xFF000000)

@@ -1,6 +1,6 @@
-package com.example.nuevocomienzo.log.domain
+package com.example.nuevocomienzo.login.domain
 
-import com.example.nuevocomienzo.log.data.model.LoginRequest
+import com.example.nuevocomienzo.login.data.model.LoginRequest
 
 class ValidateLoginUseCase {
     operator fun invoke(username: String, password: String): Result<LoginRequest> {

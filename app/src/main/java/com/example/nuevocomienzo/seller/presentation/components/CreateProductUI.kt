@@ -37,7 +37,7 @@ fun CreateProductScreen(createProductViewModel: CreateProductViewModel, id:Int, 
     var imageBase64 by remember { mutableStateOf(imageUrl) }
 
     val context = LocalContext.current
-
+    println("id..." + id+ " " + idUser)
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -142,7 +142,7 @@ fun CreateProductScreen(createProductViewModel: CreateProductViewModel, id:Int, 
                     costo = costoInput.toDoubleOrNull() ?: 0.0,
                     cantidad = cantidadInput.toDoubleOrNull() ?: 0.0,
                     imageUrl = imageBase64,
-                    idUser = idUser
+                    id_user = idUser
                 )
                 createProductViewModel.createProduct(request)
             },

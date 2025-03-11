@@ -1,6 +1,6 @@
 package com.example.nuevocomienzo.seller.data.model
 
-data class ResponseProduct (
+data class ResponseAddProduct(
     val status: String,
-    val data: List<ProductDTO>
+    val data: String
 )

@@ -1,15 +1,18 @@
-package com.example.nuevocomienzo.log.presentation
+package com.example.nuevocomienzo.login.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.nuevocomienzo.log.data.model.LoginDTO
-import com.example.nuevocomienzo.log.domain.LoginUseCase
+import com.example.nuevocomienzo.login.data.model.LoginDTO
+import com.example.nuevocomienzo.login.data.model.SubscribeResponse
+import com.example.nuevocomienzo.login.domain.LoginUseCase
+import com.example.nuevocomienzo.login.domain.SubscribeUseCase
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
     private val loginUseCase = LoginUseCase()
+    private val subscribeUseCase = SubscribeUseCase()
 
     private val _username = MutableLiveData("")
     val username: LiveData<String> = _username
@@ -20,11 +23,8 @@ class LoginViewModel : ViewModel() {
     private val _loginState = MutableLiveData<LoginState>()
     val loginState: LiveData<LoginState> = _loginState
 
-    private val _fcmToken = MutableLiveData<String>()
-    val fcmToken: LiveData<String> get() = _fcmToken
-
-    private val _installationId = MutableLiveData<String>()
-    val installationId: LiveData<String> get() = _installationId
+    private val _subscribeState = MutableLiveData<SubscribeResponse>()
+    val subscribeState: LiveData<SubscribeResponse> get() = _subscribeState
 
     fun onChangeUsername(value: String) {
         _username.value = value
@@ -45,13 +45,27 @@ class LoginViewModel : ViewModel() {
                 .onSuccess { response ->
                     _loginState.value = LoginState.Success(response)
                     println(response.data)
+                    subscribe(response.data.id)
                 }
                 .onFailure { exception ->
                     _loginState.value = LoginState.Error(exception.message ?: "Error desconocido")
                 }
         }
     }
-    
+
+    private fun subscribe(id:Int) {
+        viewModelScope.launch {
+            subscribeUseCase(id)
+                .onSuccess { response ->
+                    _subscribeState.value = response
+                    println(response.data)
+                }
+                .onFailure { exception ->
+                    _loginState.value = LoginState.Error(exception.message ?: "Error desconocido")
+                }
+        }
+    }
+
 }
 
 sealed class LoginState {

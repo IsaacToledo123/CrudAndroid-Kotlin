@@ -6,5 +6,5 @@ data class RequestProduct (
     val costo: Double,
     val cantidad: Double,
     val imageUrl: String?,
-    val idUser: Int
+    val id_user: Int
 )

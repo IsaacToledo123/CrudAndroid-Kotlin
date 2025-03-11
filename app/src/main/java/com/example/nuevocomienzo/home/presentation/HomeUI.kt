@@ -1,7 +1,5 @@
 package com.example.nuevocomienzo.home.presentation
 
-
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,21 +20,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nuevocomienzo.home.data.model.Product
 import com.example.nuevocomienzo.home.data.model.ProductDTO
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ShoppingBag
-import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.nuevocomienzo.home.data.model.OrderInfo
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.rounded.Close
+import com.example.nuevocomienzo.home.data.model.SubscribeRequest
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -53,7 +49,22 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
     val isLoading by homeViewModel.isLoading.observeAsState(initial = false)
     val error by homeViewModel.error.observeAsState(initial = "")
     val orders by homeViewModel.orders.observeAsState(initial = emptyList())
+    val successSub by homeViewModel.successSub.observeAsState(initial = "")
     var showOrderTrackingModal by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(successSub) {
+        if (successSub.isNotEmpty()) {
+            snackbarHostState.showSnackbar(
+                message = successSub,
+                duration = SnackbarDuration.Short
+            )
+
+            delay(2000)
+            homeViewModel._successSub.value = ""
+        }
+    }
 
     LaunchedEffect(key1 = Unit) {
         homeViewModel.loadSavedOrders()
@@ -69,6 +80,11 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
+            // SnackbarHost para mostrar mensajes
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
 
             Row(
                 modifier = Modifier
@@ -130,10 +146,8 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                         }
                     }
                 }
-
             }
 
-            // Error message
             if (error.isNotEmpty()) {
                 Text(
                     text = error,
@@ -141,8 +155,6 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-
-            // Loading indicator
             if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -151,7 +163,6 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                     CircularProgressIndicator(color = accentColor)
                 }
             } else {
-                // Products Grid
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 180.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -169,8 +180,8 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                                 homeViewModel.onBuyProduct(productId)
                                 showOrderTrackingModal = true
                             },
-                            onNotifyClick = { productId ->
-                                homeViewModel.onNotifyWhenAvailable(productId)
+                            onNotifyClick = { request ->
+                                homeViewModel.onNotifyWhenAvailable(request)
                             }
                         )
                     }
@@ -178,7 +189,6 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
             }
         }
 
-        // Modal de seguimiento de pedidos
         if (showOrderTrackingModal) {
             OrderTrackingModal(
                 onDismiss = { showOrderTrackingModal = false },
@@ -214,7 +224,6 @@ private fun OrderTrackingModal(
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
-                // Encabezado
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -354,7 +363,6 @@ fun OrderCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Order ID and Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -374,7 +382,6 @@ fun OrderCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Product name and price
             Text(
                 text = order.productName,
                 fontSize = 18.sp,
@@ -388,7 +395,6 @@ fun OrderCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Status section with delivery estimate
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -422,17 +428,18 @@ fun OrderCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Status indicator
             LinearProgressIndicator(
-                progress = when (order.status) {
-                    "Procesando" -> 0.25f
-                    "Enviado" -> 0.5f
-                    "En camino" -> 0.75f
-                    "Entregado" -> 1f
-                    else -> 0.1f
+                progress = {
+                    when (order.status) {
+                        "Procesando" -> 0.25f
+                        "Enviado" -> 0.5f
+                        "En camino" -> 0.75f
+                        "Entregado" -> 1f
+                        else -> 0.1f
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                color = accentColor
+                color = accentColor,
             )
         }
     }
@@ -447,9 +454,8 @@ private fun ProductCard(
     accentColor: Color,
     notificationColor: Color,
     onBuyClick: (String) -> Unit,
-    onNotifyClick: (String) -> Unit
+    onNotifyClick: (SubscribeRequest) -> Unit
 ) {
-    // Código del ProductCard (sin cambios)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -463,7 +469,6 @@ private fun ProductCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Product Image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -476,7 +481,6 @@ private fun ProductCard(
                     AsyncImage(
                         model = "https://api-movil.piweb.lat" + product.imageUrl,
                         contentDescription = product.name,
-                        contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
@@ -511,8 +515,6 @@ private fun ProductCard(
                     fontWeight = FontWeight.SemiBold,
                     color = primaryColor
                 )
-
-                // Mostrar cantidad disponible o agotado
                 if (product.cantidad > 0) {
                     Text(
                         text = "Disponibles: ${product.cantidad}",
@@ -533,7 +535,14 @@ private fun ProductCard(
 
             if (product.cantidad > 0) {
                 Button(
-                    onClick = { onBuyClick(product.id) },
+                    onClick = {
+                        val subscribeRequest = SubscribeRequest(
+                        tipo = "seguimineto",
+                        topic = "seguimineto",
+                        id_user = product.idUser.toInt(),
+                        id_product = product.id.toInt()
+                    )
+                        onNotifyClick(subscribeRequest); onBuyClick(product.id) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -557,7 +566,14 @@ private fun ProductCard(
                 }
             } else {
                 Button(
-                    onClick = { onNotifyClick(product.id) },
+                    onClick = {
+                        val subscribeRequest = SubscribeRequest(
+                            tipo = "add",
+                            topic = "add",
+                            id_user = product.idUser.toInt(),
+                            id_product = product.id.toInt()
+                        )
+                        onNotifyClick(subscribeRequest) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),

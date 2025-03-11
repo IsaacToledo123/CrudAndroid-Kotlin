@@ -1,6 +1,5 @@
 package com.example.nuevocomienzo.registro.presentation
 
-
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,18 +65,22 @@ fun RegisterScreen(
     onNavigateBack: () -> Unit,
     onRegisterSuccess: () -> Unit
 ) {
-    val username: String by registerViewModel.username.observeAsState("")
     val nombre: String by registerViewModel.nombre.observeAsState("")
     val apellidos: String by registerViewModel.apellidos.observeAsState("")
     val email: String by registerViewModel.email.observeAsState("")
     val password: String by registerViewModel.password.observeAsState("")
-    val tipoUser: String by registerViewModel.tipoUser.observeAsState("")
+    val tipoUser: String by registerViewModel.tipo_user.observeAsState("")
     val success: Boolean by registerViewModel.success.observeAsState(false)
     val error: String by registerViewModel.error.observeAsState("")
     val isRegistered: Boolean by registerViewModel.isRegistered.observeAsState(false)
     var isPasswordVisible by remember { mutableStateOf(false) }
     var expandedTipoUser by remember { mutableStateOf(false) }
-    val tiposUsuario = listOf("Cliente","vendedor")
+    val tiposUsuario = listOf("Cliente", "Vendedor")
+
+    val isFormValid = remember(nombre, apellidos, email, password, tipoUser) {
+        nombre.isNotBlank() && apellidos.isNotBlank() && email.isNotBlank() &&
+                password.isNotBlank() && tipoUser.isNotBlank()
+    }
 
     LaunchedEffect(isRegistered) {
         if (isRegistered) {
@@ -102,44 +106,8 @@ fun RegisterScreen(
             color = Color.White
         )
 
-        // Username field
-        TextField(
-            value = username,
-            onValueChange = { registerViewModel.onChangeUsername(it) },
-            label = { Text("Username", color = Color.Gray) },
-            shape = RoundedCornerShape(16.dp),
-            placeholder = { Text("username", color = Color.Gray) },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = "Person Icon",
-                    tint = Color.Gray
-                )
-            },
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFF1C1C1E),
-                focusedContainerColor = Color(0xFF1C1C1E),
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White,
-                cursorColor = Color(0xFF0A84FF),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .onFocusChanged { focusState ->
-                    if (!focusState.isFocused && username.isNotEmpty()) {
-                        registerViewModel.viewModelScope.launch {
-                            registerViewModel.onFocusChanged()
-                        }
-                    }
-                }
-        )
-
         Spacer(Modifier.height(16.dp))
 
-        // Nombre field
         TextField(
             value = nombre,
             onValueChange = { registerViewModel.onChangeNombre(it) },
@@ -153,7 +121,7 @@ fun RegisterScreen(
                     tint = Color.Gray
                 )
             },
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
+            colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color(0xFF1C1C1E),
                 focusedContainerColor = Color(0xFF1C1C1E),
                 unfocusedTextColor = Color.White,
@@ -169,7 +137,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Apellidos field
         TextField(
             value = apellidos,
             onValueChange = { registerViewModel.onChangeApellidos(it) },
@@ -183,7 +150,7 @@ fun RegisterScreen(
                     tint = Color.Gray
                 )
             },
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
+            colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color(0xFF1C1C1E),
                 focusedContainerColor = Color(0xFF1C1C1E),
                 unfocusedTextColor = Color.White,
@@ -199,7 +166,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Email field
         TextField(
             value = email,
             onValueChange = { registerViewModel.onChangeEmail(it) },
@@ -216,7 +182,7 @@ fun RegisterScreen(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Email
             ),
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
+            colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color(0xFF1C1C1E),
                 focusedContainerColor = Color(0xFF1C1C1E),
                 unfocusedTextColor = Color.White,
@@ -232,7 +198,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Password field
         TextField(
             value = password,
             onValueChange = { registerViewModel.onChangePassword(it) },
@@ -251,7 +216,7 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
+            colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color(0xFF1C1C1E),
                 focusedContainerColor = Color(0xFF1C1C1E),
                 unfocusedTextColor = Color.White,
@@ -276,7 +241,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Tipo de usuario dropdown
         ExposedDropdownMenuBox(
             expanded = expandedTipoUser,
             onExpandedChange = { expandedTipoUser = it },
@@ -300,7 +264,7 @@ fun RegisterScreen(
                         tint = Color.Gray
                     )
                 },
-                colors = androidx.compose.material3.TextFieldDefaults.colors(
+                colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color(0xFF1C1C1E),
                     focusedContainerColor = Color(0xFF1C1C1E),
                     unfocusedTextColor = Color.White,
@@ -347,12 +311,11 @@ fun RegisterScreen(
         Button(
             onClick = {
                 val user = CreateUserRequest(
-                    username = username,
                     nombre = nombre,
                     apellidos = apellidos,
                     email = email,
                     password = password,
-                    tipoUser = tipoUser
+                    tipo_user = tipoUser
                 )
                 registerViewModel.viewModelScope.launch {
                     registerViewModel.onClick(user)
@@ -361,8 +324,8 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .height(56.dp),  // Eliminado el padding bottom que causaba el colapso
-            enabled = success,
+                .height(56.dp),
+            enabled = isFormValid, // Usar la validación local en lugar de success
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF0A84FF),
                 contentColor = Color.White,

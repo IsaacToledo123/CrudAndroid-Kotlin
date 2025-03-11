@@ -13,8 +13,7 @@ interface RegisterService {
     @GET("/users/validate")
     suspend fun validateUsername() : Response<UsernameValidateDTO>
 
-    @POST("users")
+    @POST("/user")
     suspend fun createUser(@Body request : CreateUserRequest) : Response<UserDTO>
-
-
+    
 }
