@@ -39,9 +39,11 @@ fun LoginScreen(
     val errorColor = Color(0xFFFF3B30)
     val context = LocalContext.current
 
+    ServicesFireBase.initializeFirebaseMessaging()
     LaunchedEffect(loginState) {
+
         if (loginState is LoginState.Success) {
-            ServicesFireBase.initializeFirebaseMessaging()
+            //ServicesFireBase.initializeFirebaseMessaging()
             val userType = (loginState as LoginState.Success).data
             onLoginSuccess(userType.data)
         }
